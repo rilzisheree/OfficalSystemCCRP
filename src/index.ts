@@ -1,14 +1,25 @@
 import "dotenv/config";
-import {
-  Client,
-  GatewayIntentBits,
-  Partials,
-  Collection,
-} from "discord.js";
-import path from "path";
-import fs from "fs";
+import { Client, GatewayIntentBits, Partials, Collection } from "discord.js";
 import { ExtendedClient, BotCommand } from "./types.js";
 import { connectDatabase } from "./database.js";
+
+// ── Commands ──────────────────────────────────────────────────────────────────
+import * as purge from "./commands/moderation/purge.js";
+import * as say from "./commands/moderation/say.js";
+import * as dm from "./commands/moderation/dm.js";
+import * as globalban from "./commands/moderation/globalban.js";
+import * as unglobalban from "./commands/moderation/unglobalban.js";
+import * as globalbanlist from "./commands/moderation/globalbanlist.js";
+import * as allowuser from "./commands/moderation/allowuser.js";
+import * as serverlist from "./commands/utility/serverlist.js";
+import * as setlogchannel from "./commands/utility/setlogchannel.js";
+
+// ── Events ────────────────────────────────────────────────────────────────────
+import * as readyEvent from "./events/ready.js";
+import * as interactionCreateEvent from "./events/interactionCreate.js";
+import * as messageDeleteEvent from "./events/messageDelete.js";
+import * as messageUpdateEvent from "./events/messageUpdate.js";
+import * as guildMemberAddEvent from "./events/guildMemberAdd.js";
 
 const client = new Client({
   intents: [
@@ -24,62 +35,52 @@ const client = new Client({
 
 client.commands = new Collection<string, BotCommand>();
 
-async function loadCommands(): Promise<void> {
-  const commandsPath = path.join(__dirname, "commands");
-  const categories = fs.readdirSync(commandsPath);
+function loadCommands(): void {
+  const commands = [
+    purge, say, dm, globalban, unglobalban, globalbanlist, allowuser,
+    serverlist, setlogchannel,
+  ] as unknown as BotCommand[];
 
-  for (const category of categories) {
-    const categoryPath = path.join(commandsPath, category);
-    if (!fs.statSync(categoryPath).isDirectory()) continue;
-
-    const files = fs.readdirSync(categoryPath).filter((f) => f.endsWith(".js") || f.endsWith(".ts"));
-
-    for (const file of files) {
-      const filePath = path.join(categoryPath, file);
-      const command = await import(filePath) as BotCommand & { data: BotCommand["data"] };
-
-      if ("data" in command && "execute" in command) {
-        client.commands.set(command.data.name, command);
-        console.log(`[Commands] Loaded: /${command.data.name}`);
-      } else {
-        console.warn(`[Commands] Skipped ${file}: missing "data" or "execute".`);
-      }
-    }
+  for (const command of commands) {
+    client.commands.set(command.data.name, command);
+    console.log(`[Commands] Loaded: /${command.data.name}`);
   }
 }
 
-async function loadEvents(): Promise<void> {
-  const eventsPath = path.join(__dirname, "events");
-  const files = fs.readdirSync(eventsPath).filter((f) => f.endsWith(".js") || f.endsWith(".ts"));
+type EventModule = {
+  name: string;
+  once: boolean;
+  execute: (...args: unknown[]) => Promise<void>;
+};
 
-  for (const file of files) {
-    const filePath = path.join(eventsPath, file);
-    const event = await import(filePath) as {
-      name: string;
-      once: boolean;
-      execute: (...args: unknown[]) => Promise<void>;
+function loadEvents(): void {
+  const events = [
+    readyEvent, interactionCreateEvent, messageDeleteEvent,
+    messageUpdateEvent, guildMemberAddEvent,
+  ] as unknown as EventModule[];
+
+  for (const event of events) {
+    const handler = (...args: unknown[]) => {
+      event.execute(client, ...args).catch((err: unknown) => {
+        console.error(`[Event Error] ${event.name}:`, err);
+      });
     };
-
-    const handler = (...args: unknown[]) => event.execute(client, ...args);
-
     if (event.once) {
       client.once(event.name, handler);
     } else {
       client.on(event.name, handler);
     }
-
     console.log(`[Events] Loaded: ${event.name}`);
   }
 }
 
 async function main(): Promise<void> {
   const token = process.env.DISCORD_TOKEN;
-  if (!token) throw new Error("DISCORD_TOKEN is not set in environment variables.");
+  if (!token) throw new Error("DISCORD_TOKEN is not set.");
 
   await connectDatabase();
-  await loadCommands();
-  await loadEvents();
-
+  loadCommands();
+  loadEvents();
   await client.login(token);
 }
 
