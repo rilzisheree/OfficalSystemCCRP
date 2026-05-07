@@ -31,7 +31,7 @@ export async function execute(
           .setColor(Colors.Error)
           .setDescription("You do not have permission to use this command."),
       ],
-      ephemeral: true,
+      flags: 64,
     });
     return;
   }
@@ -46,7 +46,7 @@ export async function execute(
           .setColor(Colors.Error)
           .setDescription("You cannot DM a bot."),
       ],
-      ephemeral: true,
+      flags: 64,
     });
     return;
   }
@@ -68,7 +68,7 @@ export async function execute(
           .setColor(Colors.Success)
           .setDescription(`DM sent to **${targetUser.tag}** successfully.`),
       ],
-      ephemeral: true,
+      flags: 64,
     });
   } catch {
     await interaction.reply({
@@ -79,7 +79,7 @@ export async function execute(
             `Could not send a DM to **${targetUser.tag}**. Their DMs may be closed.`
           ),
       ],
-      ephemeral: true,
+      flags: 64,
     });
   }
 }
