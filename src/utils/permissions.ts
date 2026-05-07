@@ -3,7 +3,7 @@ import { AllowUser } from "../models/AllowUser.js";
 
 // Add your Discord user IDs here:
 const OWNER_IDS: string[] = [
-  "949585301507047424",
+  "424314513211392001",
   "523213302860349450",
 ];
 
