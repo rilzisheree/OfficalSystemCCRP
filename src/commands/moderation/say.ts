@@ -60,7 +60,7 @@ export async function execute(
           .setColor(Colors.Error)
           .setDescription("You do not have permission to use this command."),
       ],
-      ephemeral: true,
+      flags: 64,
     });
     return;
   }
@@ -79,7 +79,7 @@ export async function execute(
     if (!targetChannel || !(targetChannel instanceof TextChannel)) {
       await interaction.reply({
         embeds: [new EmbedBuilder().setColor(Colors.Error).setDescription("Invalid channel.")],
-        ephemeral: true,
+        flags: 64,
       });
       return;
     }
@@ -94,7 +94,7 @@ export async function execute(
                 .setColor(Colors.Error)
                 .setDescription(`Could not find message with ID \`${replyId}\`.`),
             ],
-            ephemeral: true,
+            flags: 64,
           });
           return;
         }
@@ -109,7 +109,7 @@ export async function execute(
             .setColor(Colors.Success)
             .setDescription(`Message sent in <#${targetChannel.id}>.`),
         ],
-        ephemeral: true,
+        flags: 64,
       });
     } catch {
       await interaction.reply({
@@ -118,7 +118,7 @@ export async function execute(
             .setColor(Colors.Error)
             .setDescription("Failed to send message. Check bot permissions."),
         ],
-        ephemeral: true,
+        flags: 64,
       });
     }
   } else if (sub === "edit") {
@@ -133,7 +133,7 @@ export async function execute(
     if (!targetChannel || !(targetChannel instanceof TextChannel)) {
       await interaction.reply({
         embeds: [new EmbedBuilder().setColor(Colors.Error).setDescription("Invalid channel.")],
-        ephemeral: true,
+        flags: 64,
       });
       return;
     }
@@ -146,7 +146,7 @@ export async function execute(
             .setColor(Colors.Error)
             .setDescription(`Could not find message with ID \`${messageId}\`.`),
         ],
-        ephemeral: true,
+        flags: 64,
       });
       return;
     }
@@ -158,7 +158,7 @@ export async function execute(
             .setColor(Colors.Error)
             .setDescription("I can only edit my own messages."),
         ],
-        ephemeral: true,
+        flags: 64,
       });
       return;
     }
@@ -171,7 +171,7 @@ export async function execute(
             .setColor(Colors.Success)
             .setDescription(`Message edited successfully. [Jump to message](${msg.url})`),
         ],
-        ephemeral: true,
+        flags: 64,
       });
     } catch {
       await interaction.reply({
@@ -180,7 +180,7 @@ export async function execute(
             .setColor(Colors.Error)
             .setDescription("Failed to edit message."),
         ],
-        ephemeral: true,
+        flags: 64,
       });
     }
   }
