@@ -52,9 +52,7 @@ export async function execute(
   interaction: ChatInputCommandInteraction,
   client: Client
 ): Promise<void> {
-  const allowed = await hasCommandPermission(interaction, "say", [
-    PermissionFlagsBits.ManageMessages,
-  ]);
+  const allowed = await hasCommandPermission(interaction, "say");
   if (!allowed) {
     await interaction.reply({
       embeds: [
