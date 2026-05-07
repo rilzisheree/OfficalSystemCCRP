@@ -23,9 +23,7 @@ export async function execute(
   interaction: ChatInputCommandInteraction,
   client: Client
 ): Promise<void> {
-  const allowed = await hasCommandPermission(interaction, "dm", [
-    PermissionFlagsBits.ModerateMembers,
-  ]);
+  const allowed = await hasCommandPermission(interaction, "dm");
   if (!allowed) {
     await interaction.reply({
       embeds: [
