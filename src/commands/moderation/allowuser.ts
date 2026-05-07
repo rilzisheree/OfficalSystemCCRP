@@ -7,6 +7,7 @@ import {
 } from "discord.js";
 import { Colors } from "../../utils/colors.js";
 import { AllowUser } from "../../models/AllowUser.js";
+import { isOwner } from "../../utils/permissions.js";
 
 const AVAILABLE_COMMANDS = [
   "purge", "say", "dm", "globalban", "unglobalban", "globalbanlist",
@@ -65,12 +66,12 @@ export async function execute(
   interaction: ChatInputCommandInteraction,
   _client: Client
 ): Promise<void> {
-  if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+  if (!isOwner(interaction.user.id)) {
     await interaction.reply({
       embeds: [
         new EmbedBuilder()
           .setColor(Colors.Error)
-          .setDescription("You must be an administrator to manage command permissions."),
+          .setDescription(`Only the bot owner can manage command permissions.\n\n**Your ID:** \`${interaction.user.id}\``),
       ],
       ephemeral: true,
     });
