@@ -1,39 +1,19 @@
-import { ChatInputCommandInteraction, GuildMember, PermissionFlagsBits } from "discord.js";
-import { AllowUser } from "../models/AllowUser.js";
+import { Client, ActivityType } from "discord.js";
+import { getOwnerIds } from "../utils/permissions.js";
 
-export async function hasCommandPermission(
-  interaction: ChatInputCommandInteraction,
-  commandName: string,
-  requiredPermissions: bigint[] = [PermissionFlagsBits.Administrator]
-): Promise<boolean> {
-  if (isOwner(interaction.user.id)) return true;
+export const name = "ready";
+export const once = true;
 
-  const member = interaction.member as GuildMember | null;
-  if (!member || !interaction.guildId) return false;
+export async function execute(client: Client): Promise<void> {
+  if (!client.user) return;
 
-  if (member.permissions.has(PermissionFlagsBits.Administrator)) return true;
-
-  const hasPerms = requiredPermissions.every((perm) => member.permissions.has(perm));
-  if (hasPerms) return true;
-
-  const allowEntry = await AllowUser.findOne({
-    userId: interaction.user.id,
-    guildId: interaction.guildId,
+  client.user.setPresence({
+    activities: [{ name: "Moderating the Shikai World.", type: ActivityType.Watching }],
+    status: "dnd",
   });
 
-  if (allowEntry && allowEntry.commands.includes(commandName)) return true;
-
-  return false;
-}
-
-export function getOwnerIds(): string[] {
-  const raw = process.env.BOT_OWNER_IDS ?? process.env.BOT_OWNER_ID ?? "";
-  return raw
-    .split(",")
-    .map((id) => id.trim())
-    .filter((id) => id.length > 0);
-}
-
-export function isOwner(userId: string): boolean {
-  return getOwnerIds().includes(userId);
+  const owners = getOwnerIds();
+  console.log(`[Bot] Logged in as ${client.user.tag}`);
+  console.log(`[Bot] Serving ${client.guilds.cache.size} guild(s)`);
+  console.log(`[Bot] Owner IDs loaded: ${owners.length > 0 ? owners.join(", ") : "NONE — BOT_OWNER_IDS is not set!"}`);
 }
