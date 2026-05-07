@@ -28,14 +28,14 @@ export async function execute(
       embeds: [
         new EmbedBuilder()
           .setColor(Colors.Error)
-          .setDescription("Only the bot owner can use this command."),
+          .setDescription(`Only the bot owner can use this command.\n\n**Your ID:** \`${interaction.user.id}\`\nAdd this to \`BOT_OWNER_IDS\` in Railway if this is you.`),
       ],
-      ephemeral: true,
+      flags: 64,
     });
     return;
   }
 
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ flags: 64 });
 
   const bans = await GlobalBan.find().sort({ bannedAt: -1 });
 
