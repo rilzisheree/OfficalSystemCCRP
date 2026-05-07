@@ -37,7 +37,7 @@ export async function execute(
           .setColor(Colors.Error)
           .setDescription("You do not have permission to use this command."),
       ],
-      ephemeral: true,
+      flags: 64,
     });
     return;
   }
@@ -46,7 +46,7 @@ export async function execute(
   const targetUser = interaction.options.getUser("user");
   const channel = interaction.channel as TextChannel;
 
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ flags: 64 });
 
   let messages = await channel.messages.fetch({ limit: 100 });
 
