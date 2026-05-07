@@ -4,11 +4,8 @@ WORKDIR /app
 
 RUN npm install -g pnpm
 
-COPY package.json ./
-RUN pnpm install --no-frozen-lockfile
-
 COPY . .
 
-RUN pnpm build
+RUN pnpm install --no-frozen-lockfile
 
-CMD ["node", "dist/index.js"]
+CMD ["npx", "tsx", "src/index.ts"]
